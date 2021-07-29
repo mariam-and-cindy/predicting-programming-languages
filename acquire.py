@@ -13,14 +13,49 @@ import requests
 
 from env import github_token, github_username
 
-# TODO: Make a github personal access token.
-#     1. Go here and generate a personal access token https://github.com/settings/tokens
-#        You do _not_ need select any scopes, i.e. leave all the checkboxes unchecked
-#     2. Save it in your env.py file under the variable `github_token`
-# TODO: Add your github username to your env.py file under the variable `github_username`
-# TODO: Add more repositories to the `REPOS` list below.
+# required imports
+from requests import get
+import json
+import csv
 
-REPOS = ['SJang1/korea-covid-19-remaining-vaccine-macro', 'bradtraversy/50projects50days', 'freeCodeCamp/freeCodeCamp']
+def get_github_repos(cached=False):
+
+    repo_list = []
+
+    # If the cached parameter is true, or the csv file is present, use that
+
+    if (os.path.isfile('git_urls.csv') == True or cached == True):
+
+        # read from the cache file on disk
+
+        with open('git_urls.csv') as f:
+            reader = csv.reader(f)
+            data = list(reader)
+        repo_list = data[0]
+
+    else:
+        # read from github
+        url = 'https://api.github.com/repositories?ID=50000'
+        headers = {'User-Agent': 'Codeup Data Science'} # Some websites don't accept the pyhon-requests default user-agent
+        response = get(url, headers=headers)
+        data = json.loads(response.text)
+        for repo in data:
+            repo_list.append(repo['full_name'])
+        # save to the cache file
+        with open('git_urls.csv', 'w') as f:
+            write = csv.writer(f)
+            write.writerow(repo_list)
+
+    # either way, return the list of repos
+    return repo_list
+
+# if __name__ == "__main__":
+#     data = get_github_repos()
+
+
+# REPOS = ['SJang1/korea-covid-19-remaining-vaccine-macro', 'bradtraversy/50projects50days', 'freeCodeCamp/freeCodeCamp']
+
+REPOS = get_github_repos()
 
 headers = {"Authorization": f"token {github_token}", "User-Agent": github_username}
 
@@ -28,7 +63,6 @@ if headers["Authorization"] == "token " or headers["User-Agent"] == "":
     raise Exception(
         "You need to follow the instructions marked TODO in this script before trying to use it"
     )
-
 
 def github_api_request(url: str) -> Union[List, Dict]:
     response = requests.get(url, headers=headers)
@@ -80,7 +114,15 @@ def process_repo(repo: str) -> Dict[str, str]:
     dictionary with the language of the repo and the readme contents.
     """
     contents = get_repo_contents(repo)
-    readme_contents = requests.get(get_readme_download_url(contents)).text
+    readme_url = get_readme_download_url(contents)
+    if (readme_url == ''):
+        readme_contents = ''
+    else:
+        readme_contents = requests.get(get_readme_download_url(contents)).text
+    # if (readme_contents isnull()):
+    #     readme_contents = ''
+
+    # print(get_repo_language(repo))
     return {
         "repo": repo,
         "language": get_repo_language(repo),
