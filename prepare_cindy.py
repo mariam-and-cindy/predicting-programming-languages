@@ -8,6 +8,7 @@ from nltk.corpus import stopwords
 
 import pandas as pd
 import acquire as a
+from textblob import TextBlob
 
 
 #import
@@ -179,14 +180,30 @@ def miss_dup_values(df):
     return mis_val_table_ren_columns
 
 
-def drop_missing_values(df):
+def remove_nonenglish (df):
     '''
-    takes in a df and get the missing values.
-    remove the rows that has columuns with missing values**
+    takes in df and 1 column to check if the text is in englis if not that row is going to be remove
     '''
-    miss_val =miss_dup_values(df)
-    list_rows = list(miss_val.index)
-    #drop rows with null values 
-    df = df.dropna(axis=0, subset = list_rows).reset_index(drop=True)
-    
+    for n in range (0, len(df)):
+        text = df.readme_contents[n]
+        lang = TextBlob(text)
+        if lang.detect_language() != 'en':
+            df =df.drop([n])
     return df
+
+
+
+def prepare_mf (df):
+    '''
+    takes in a df and all the rows with missing information, non English text,
+    and then clean, tokenize, stemming, lemmatize
+    '''
+    #removing texts that are not English
+    df = remove_nonenglish(df)
+    #removing all missing values
+    #removing missing values
+    df = df.dropna(axis=0).reset_index(drop=True)
+    #use my prepare function to  clean, tokenized, stemming, lemmatize
+    df =prepare_data(df, 'readme_contents')
+    return df
+    
