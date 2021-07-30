@@ -127,10 +127,7 @@ def process_repo(repo: str) -> Dict[str, str]:
         readme_contents = ''
     else:
         readme_contents = requests.get(get_readme_download_url(contents)).text
-    # if (readme_contents isnull()):
-    #     readme_contents = ''
-
-    # print(get_repo_language(repo))
+    
     return {
         "repo": repo,
         "language": get_repo_language(repo),
