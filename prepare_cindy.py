@@ -198,11 +198,12 @@ def prepare_mf (df):
     takes in a df and all the rows with missing information, non English text,
     and then clean, tokenize, stemming, lemmatize
     '''
+        #removing missing values
+    df = df.dropna(axis=0).reset_index(drop=True)
     #removing texts that are not English
     df = remove_nonenglish(df)
-    #removing all missing values
-    #removing missing values
-    df = df.dropna(axis=0).reset_index(drop=True)
+
+
     #use my prepare function to  clean, tokenized, stemming, lemmatize
     df =prepare_data(df, 'readme_contents')
     return df
