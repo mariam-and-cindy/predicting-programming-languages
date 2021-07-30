@@ -15,42 +15,50 @@ from env import github_token, github_username
 
 # required imports
 from requests import get
-import json
-import csv
+import pandas as pd
+from bs4 import BeautifulSoup
+import time
+import random
 
-def get_github_repos(cached=False):
-
-    repo_list = []
-
-    # If the cached parameter is true, or the csv file is present, use that
-
-    if (os.path.isfile('git_urls.csv') == True or cached == True):
-
-        # read from the cache file on disk
-
-        with open('git_urls.csv') as f:
-            reader = csv.reader(f)
-            data = list(reader)
-        repo_list = data[0]
-
-    else:
-        # read from github
-        url = 'https://api.github.com/repositories?ID=50000'
+# goes to github and pages through the most forked repos, grabbing the 'num_pages' number of pages
+def fetch_github_repos(num_pages):
+    items_list = []
+    # to make this simple, we will grab repos with the most forks and with stars > 1
+    # the top pages have the format https://github.com/search?o=desc&p=1&q=stars%3A%3E1&s=forks&type=Repositories
+    # so we need to increment the p= parameter to go to each subsequent page
+    for i in range(1,num_pages+1):
+        # add a sleep amount of random time so that we don't get HTTP 429s
+        time.sleep(random.random())
         headers = {'User-Agent': 'Codeup Data Science'} # Some websites don't accept the pyhon-requests default user-agent
+        url = f'https://github.com/search?o=desc&p={i}&q=stars%3A%3E1&s=forks&type=Repositories'
         response = get(url, headers=headers)
-        data = json.loads(response.text)
-        for repo in data:
-            repo_list.append(repo['full_name'])
-        # save to the cache file
-        with open('git_urls.csv', 'w') as f:
-            write = csv.writer(f)
-            write.writerow(repo_list)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # each page has 10 results. Let's loop through and find each instance of page element element = 'a' class = 'v-align-middle'
+        links = soup.find_all('a', class_='v-align-middle')
+        for repo_link in links:
+            time.sleep(random.random())
+            repo_name = repo_link.text
+            # add it to our output array
+            items_list.append(repo_name)
+    return items_list
+
+# returns a list of github repo names, either from a file on disk or from github using the fetch_github_repos function
+def get_github_repos(cached=False, num_pages = 20):
+    # If the cached parameter is false, or the csv file is absent, use github
+    if cached == False or os.path.isfile('git_urls.csv') == False:
+        # read from github
+        repo_list = fetch_github_repos(num_pages)
+        # and write to the cache file for next time
+        df = pd.DataFrame(repo_list, columns=['repos'])
+        df.to_csv('git_urls.csv', index=False)
+    else:
+        # read from the cache file on disk
+        df = pd.read_csv("git_urls.csv")
+        repo_list = df['repos'].to_list()
 
     # either way, return the list of repos
     return repo_list
-
-# if __name__ == "__main__":
-#     data = get_github_repos()
 
 
 # REPOS = ['SJang1/korea-covid-19-remaining-vaccine-macro', 'bradtraversy/50projects50days', 'freeCodeCamp/freeCodeCamp']
