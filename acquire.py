@@ -44,7 +44,7 @@ def fetch_github_repos(num_pages):
     return items_list
 
 # returns a list of github repo names, either from a file on disk or from github using the fetch_github_repos function
-def get_github_repos(cached=False, num_pages = 20):
+def get_github_repos(cached=False, num_pages = 40):
     # If the cached parameter is false, or the csv file is absent, use github
     if cached == False or os.path.isfile('git_urls.csv') == False:
         # read from github
