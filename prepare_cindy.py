@@ -5,7 +5,7 @@ import json
 import nltk
 from nltk.tokenize.toktok import ToktokTokenizer
 from nltk.corpus import stopwords
-
+from sklearn.model_selection import train_test_split
 import pandas as pd
 import acquire as a
 from textblob import TextBlob
@@ -51,6 +51,9 @@ def basic_clean (string):
     .encode('ascii', 'ignore')\
     .decode('utf-8')
     string = re.sub(r"[^a-z0-9\s]", '', string)
+    string = re.sub(r'\w*http\w*', '', string)
+    string = re.sub(r'\w*github\w*', '', string)
+    string = re.sub(r'\w*html\w*', '', string)
     return string
 
 
@@ -175,7 +178,7 @@ def miss_dup_values(df):
            "There are " + str(mis_val_table_ren_columns.shape[0]) +
            " columns that have missing values.")
     print( "  ")
-    print (f"** There are {dup} duplicate rows that represents {round(dup_percent, 2)}% of total Values**")
+    # print (f"** There are {dup} duplicate rows that represents {round(dup_percent, 2)}% of total Values**")
         # Return the dataframe with missing information
     return mis_val_table_ren_columns
 
@@ -189,22 +192,90 @@ def remove_nonenglish (df):
         lang = TextBlob(text)
         if lang.detect_language() != 'en':
             df =df.drop([n])
-    return df
+    return df.reset_index(drop=True)
 
-
+def remove_lang (df):
+    '''
+    takes in df and 1 column to check if the text is in englis if not that row is going to be remove
+    '''
+    #create a df with the unique languages
+    targ =pd.DataFrame(df[['language']].value_counts())\
+    .reset_index().rename(columns= {0:'cnt', 'index':'language'})
+    #get the list of the unique languiages
+    lang2drop= list(targ.language[targ.cnt ==1].values)
+    for n in range (0, len(df)):
+        if df.language[n] in lang2drop:
+            df =df.drop([n])
+    return df.reset_index(drop = True)
 
 def prepare_mf (df):
     '''
     takes in a df and all the rows with missing information, non English text,
     and then clean, tokenize, stemming, lemmatize
     '''
-        #removing missing values
+    #removing missing values
     df = df.dropna(axis=0).reset_index(drop=True)
     #removing texts that are not English
     df = remove_nonenglish(df)
 
-
     #use my prepare function to  clean, tokenized, stemming, lemmatize
     df =prepare_data(df, 'readme_contents')
+
+    #remove the rows with unique languages because we cannot use them when we split
+    df = remove_lang (df)
+
+    #replace Jupyter notebook by python
+    df['language'].replace('Jupyter Notebook', 'Python', inplace=True )
     return df
     
+
+
+def split_data(df, target):
+    '''
+        This function takes in a dataframe, the name of the target variable
+    (for stratification purposes), and an integer for a setting a seed
+    and splits the data into train, validate and test. 
+    Test is 20% of the original dataset, validate is .30*.80= 24% of the 
+    original dataset, and train is .70*.80= 56% of the original dataset. 
+    The function returns, in this order, train, validate and test dataframes
+    
+    '''
+    train_validate, test = train_test_split(df, test_size=.2, random_state=123, stratify=df[target])
+    train, validate = train_test_split(train_validate, 
+                                       test_size=.3, 
+                                       random_state=123, 
+                                       stratify=train_validate[target])
+    
+    
+    print(f'complete df -> {df.shape}')
+    print(f'train -> {train.shape}')
+    print(f'validate -> {validate.shape}')
+    print(f'test -> {test.shape}')
+
+    return train, validate, test
+
+
+def split_Xy (train, validate, test, target):
+    '''
+    This function takes in three dataframe (train, validate, test) and a target  and splits each of the 3 samples
+    into a dataframe with independent variables and a series with the dependent, or target variable.
+    The function returns 3 dataframes and 3 series:
+    X_train (df) & y_train (series), X_validate & y_validate, X_test & y_test.
+    Example:
+    X_train, y_train, X_validate, y_validate, X_test, y_test = split_Xy (train, validate, test, 'Fertility' )
+    '''
+    
+    #split train
+    X_train = train.drop(columns= [target])
+    y_train= train[target]
+    #split validate
+    X_validate = validate.drop(columns= [target])
+    y_validate= validate[target]
+    #split validate
+    X_test = test.drop(columns= [target])
+    y_test= test[target]
+
+    print(f'X_train -> {X_train.shape}               y_train->{y_train.shape}')
+    print(f'X_validate -> {X_validate.shape}         y_validate->{y_validate.shape} ')        
+    print(f'X_test -> {X_test.shape}                  y_test>{y_test.shape}') 
+    return  X_train, y_train, X_validate, y_validate, X_test, y_test
