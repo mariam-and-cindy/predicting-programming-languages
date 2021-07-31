@@ -51,6 +51,9 @@ def basic_clean (string):
     .encode('ascii', 'ignore')\
     .decode('utf-8')
     string = re.sub(r"[^a-z0-9\s]", '', string)
+    string = re.sub(r'\w*http\w*', '', string)
+    string = re.sub(r'\w*github\w*', '', string)
+    string = re.sub(r'\w*html\w*', '', string)
     return string
 
 
