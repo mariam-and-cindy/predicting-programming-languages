@@ -209,24 +209,28 @@ def prepare_mf (df):
     takes in a df and all the rows with missing information, non English text,
     and then clean, tokenize, stemming, lemmatize
     '''
+    #remove missing
+    df =df.drop_duplicates()
+    
     #removing missing values
     df = df.dropna(axis=0).reset_index(drop=True)
-
+    
     #removing texts that are not English
     df = remove_nonenglish(df)
 
     #replace Jupyter notebook by python
     df['language'].replace('Jupyter Notebook', 'Python', inplace=True )
-
-    #get the top 5 programming languages
+    
+        
+    #get the top n languages
     df = top_n_target(df, 'language', 5)
-
-
+    
     #use my prepare function to  clean, tokenized, stemming, lemmatize
     df =prepare_data(df, 'readme_contents')
 
 
-    return df.reset_index(drop=True)
+
+    return df
     
 
 
