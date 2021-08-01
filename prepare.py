@@ -8,7 +8,7 @@ from nltk.corpus import stopwords
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import acquire as a
-from textblob import TextBlob
+#from textblob import TextBlob
 
 
 #import
@@ -18,23 +18,6 @@ warnings.filterwarnings("ignore")
 
 
 
-
-def clean_df(df):
-    '''
-    takes in a df and lowercase everything, normalize unicode characters, replace anything that is not a letter,
-    number, whitespace or a single quote.
-    retunr a clean df
-    '''
-    for column in df.columns:
-        #get lowercase
-        df[column]= df[column].str.lower()
-        #normalize
-        df[column]= [unicodedata.normalize('NFKC',df[column][n])\
-                     .encode('ascii', 'ignore')\
-                    .decode('utf-8') for n in range (0, len(df))]
-        #remove special characters
-        df[column]= [re.sub(r"[^a-z0-9\s]", '', df[column][n] ) for n in range (0, len(df))]
-    return df
 
 
 
@@ -54,6 +37,9 @@ def basic_clean (string):
     string = re.sub(r'\w*http\w*', '', string)
     string = re.sub(r'\w*github\w*', '', string)
     string = re.sub(r'\w*html\w*', '', string)
+    string = re.sub(r'\w*gmail\w*', '', string)
+    string = re.sub(r'\w*\n\w*', '', string)
+
     return string
 
 
@@ -178,55 +164,67 @@ def miss_dup_values(df):
            "There are " + str(mis_val_table_ren_columns.shape[0]) +
            " columns that have missing values.")
     print( "  ")
-    # print (f"** There are {dup} duplicate rows that represents {round(dup_percent, 2)}% of total Values**")
-        # Return the dataframe with missing information
+    print (f"** There are {dup} duplicate rows that represents {round(dup_percent, 2)}% of total Values**")
+
     return mis_val_table_ren_columns
 
 
-def remove_nonenglish (df):
-    '''
-    takes in df and 1 column to check if the text is in englis if not that row is going to be remove
-    '''
-    for n in range (0, len(df)):
-        text = df.readme_contents[n]
-        lang = TextBlob(text)
-        if lang.detect_language() != 'en':
-            df =df.drop([n])
-    return df.reset_index(drop=True)
+# def remove_nonenglish (df):
+#     '''
+#     takes in df and 1 column to check if the text is in englis if not that row is going to be remove
+#     '''
+#     for n in range (0, len(df)):
+#         text = df.readme_contents[n]
+#         lang = TextBlob(text)
+#         if lang.detect_language() != 'en':
+#             df =df.drop([n])
+#     return df.reset_index(drop=True)
 
 def top_n_target(df,target,  n):
+    '''
+    takes in a df , target and the number of top target that you want
+    '''
     #get the value counts of the target
     targ =pd.DataFrame(df[[target]].value_counts())\
     .reset_index().rename(columns= {0:'cnt', 'index':target})
     #get the top 5
     topl= list(targ.loc[0:(n-1)].language.values)
     #get new df with only the top n values of target
-    df= df[df.language.isin(topl)].reset_index()
+    df= df[df.language.isin(topl)].reset_index(drop=True)
     return  df
 
-def prepare_mf (df):
+def prepare_mf (df,extra_words=[], exclude_words=[] ):
     '''
     takes in a df and all the rows with missing information, non English text,
     and then clean, tokenize, stemming, lemmatize
     '''
-    #remove missing
+    
+    # remove non english
+    index_nonenglish = [16,19,37,43,76,90,108,115,124,131,135,138,143,151,152,156,166,171,174,185,193,197,199,
+       205,208,211, 216,217,221,224,229,230,239,241,248,273,277,278,279,292,298,310,311,316,317,
+       324,328,329,330,336,341,352,357,365,366,372,374,379,385,390,399]
+
+    df = df.drop(df.index[[index_nonenglish]])
+    
+    
+    #remove duplicates 
     df =df.drop_duplicates()
     
     #removing missing values
     df = df.dropna(axis=0).reset_index(drop=True)
     
-    #removing texts that are not English
-    df = remove_nonenglish(df)
+    
 
     #replace Jupyter notebook by python
     df['language'].replace('Jupyter Notebook', 'Python', inplace=True )
     
         
+        
     #get the top n languages
-    df = top_n_target(df, 'language', 5)
+    df = top_n_target(df, 'language', 5).reset_index(drop=True)
     
     #use my prepare function to  clean, tokenized, stemming, lemmatize
-    df =prepare_data(df, 'readme_contents')
+    df =prepare_data(df, 'readme_contents', extra_words= extra_words, exclude_words=exclude_words)
 
 
 
@@ -259,27 +257,3 @@ def split_data(df, target):
     return train, validate, test
 
 
-def split_Xy (train, validate, test, target):
-    '''
-    This function takes in three dataframe (train, validate, test) and a target  and splits each of the 3 samples
-    into a dataframe with independent variables and a series with the dependent, or target variable.
-    The function returns 3 dataframes and 3 series:
-    X_train (df) & y_train (series), X_validate & y_validate, X_test & y_test.
-    Example:
-    X_train, y_train, X_validate, y_validate, X_test, y_test = split_Xy (train, validate, test, 'Fertility' )
-    '''
-    
-    #split train
-    X_train = train.drop(columns= [target])
-    y_train= train[target]
-    #split validate
-    X_validate = validate.drop(columns= [target])
-    y_validate= validate[target]
-    #split validate
-    X_test = test.drop(columns= [target])
-    y_test= test[target]
-
-    print(f'X_train -> {X_train.shape}               y_train->{y_train.shape}')
-    print(f'X_validate -> {X_validate.shape}         y_validate->{y_validate.shape} ')        
-    print(f'X_test -> {X_test.shape}                  y_test>{y_test.shape}') 
-    return  X_train, y_train, X_validate, y_validate, X_test, y_test
