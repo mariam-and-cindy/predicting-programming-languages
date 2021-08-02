@@ -6,11 +6,11 @@
 
 -------------------
 
-Perform statistical analysis on data collected via web-scraping of the GitHub site. After collecting a minimal amount of data from GitHub, including the project's Readme file, we attempted to predict the primary programming language used in each project.
+Perform statistical analysis on data collected via web-scraping of the GitHub site. After collecting over 300 repositories from GitHub we predicted the primary programming language used in each project.
 
  
 
-This involves data cleaning, wrangling and exploration, as well as modeling and validation/verification of modeling results.
+This project involves data cleaning, wrangling and exploration, as well as modeling and validation/verification of modeling results.
 
  
 
@@ -53,7 +53,7 @@ This involves data cleaning, wrangling and exploration, as well as modeling and 
 | ----- | ----- | ----- |----- |
 | repo  |     object  | Unique name for the repo |  slash delimited string|
 | language |  object | The programming language used in this project | string (eg python/javascript/etc) |
-| readme contents     |   object |  The entirety of the project's readme file | plaintext string |
+| readme contents     |   object |  The entirety of the project's readme file | plain text string |
 
  
 
@@ -63,9 +63,9 @@ Additionally, a set of features were added to the data set:
 
 | Name  |  Datatype    |         Definition     |       Possible Values |
 | ----- | ----- | ----- |----- |
-| clean |  object|  Parsing Text of the readme_content column  :| plaintext string  |
-| stemmed |  object |  Stemmed text of the clean column | plaintext string  |
-| lemmatized | object| Lemmatized text of clean  column | plaintext string  |
+| clean |  object|  Parsing Text of the readme_content column  :| plain text string  |
+| stemmed |  object |  Stemmed text of the clean column | plain text string  |
+| lemmatized | object| Lemmatized text of clean  column | plain text string  |
 | readme_length |  int64  | lenght of the README content |  numeric |
 | word_count | int64  | total of words of the README  | numeric |
 
@@ -107,9 +107,9 @@ This is accomplished via the python script named “acquire.py”. The script wi
 
 - store these in git_urls.csv - that way, we would not hit GituHub's page and scrape the same data repeatedly. Moreover, this ensures that subsequent processing executions will consistently use the same repo list, leading to a more reliable and consistent result.
 
-- capture these repository names as a strings in  a python list object.
+- capture these repository names as a strings in a python list object.
 
-- Once the list of repositories is collected, use a second script to collect the following information from those repositories, including:
+- Once the list of repositories is collected, use functions from the acquire script to collect the following information from those repositories, including:
 
                 - repository name
 
@@ -118,6 +118,8 @@ This is accomplished via the python script named “acquire.py”. The script wi
                 - contents of the readme for that repository
 
 - These values are dumped, as json data, into the data2.json file - this once again ensures that we are not using cached data and avoids unnecessary web calls to the GitHub API, while maintaining consistency in results.
+
+- After removing non English repositories from the json file, we cache it as a csv file and read that into a pandas dataframe in this notebook.
 
  
 
@@ -137,9 +139,7 @@ This functionality is stored in the python script "prepare.py". It will perform 
 
 - remove unnecessary stopwords
 
-- remove non-english records (some repositories are written in other languages altogether)
-
-- remove any records where the readme contents was null or empty
+- remove any records where the readme contents were null or empty
 
 - Split the data into 3 datasets - train/test/validate - used in modeling
 
@@ -207,10 +207,15 @@ Finally, open the Jupyter notebook titled “final_report_nlp” and execute the
 
 ---------
 
-During the analysis process, we made use of the following classification  models:
-- Decsion Tree
-- KNN
-- Logistic Regression
+- During the analysis process, we made use of the following classification  models:
+  - Decsion Tree
+  - KNN
+  - Logistic Regression
+  - Random Forest
+  - Naive Bayes
+- We evaluated model perfomance based on the overall accuracy scores.
+- All models beat the baseline accuracy of 34%.
+- OUr best performing model was the Decision Tree Model which had an overall accuracy of 55% on test data.
  
 
  
@@ -221,4 +226,6 @@ During the analysis process, we made use of the following classification  models
 
 If we had more time, we would:
 
-- 
+- Use idf to create models instead of bag of words
+- Use fewer languages in models
+
