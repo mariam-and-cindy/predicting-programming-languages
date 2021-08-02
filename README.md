@@ -6,7 +6,7 @@
 
 -------------------
 
-Perform statistical analysis on data collected via web-scraping of the GitHub site. After collecting a minimal amount of data from GitHub, including the project's Readme file, attmept to predict the language used in each project.
+Perform statistical analysis on data collected via web-scraping of the GitHub site. After collecting a minimal amount of data from GitHub, including the project's Readme file, attempt to predict the language used in each project.
 
  
 
@@ -26,6 +26,8 @@ This involves data cleaning, wrangling and exploration, as well as modeling and 
 
                 c. exploration of data
 
+                d. modeling
+
 2. Perform statistical analysis to test hypotheses
 
 3. Build and evaluate Classification models to predict the Programming Language used in a given project
@@ -42,23 +44,6 @@ This involves data cleaning, wrangling and exploration, as well as modeling and 
 
  
 
-Initial Hypotheses
-
-------------------
-
-Hypotheses 1:
-
- 
-
-Confidence level =
-
-Alpha = 1 - Confidence level =
-
-H0:
-
-H1:
-
-Hypotheses 2:
 
  
 
@@ -66,13 +51,11 @@ Hypotheses 2:
 
 ---------------
 
-Name    Datatype             Definition            Possible Values
-
-repo name          non-null string   Unique name for the repo            slash delimited string
-
-repo language   non-null string   The programming language used in this project  string (eg python/javascript/etc)
-
-readme contents             non-null string   The entirety of the project's readme file plaintext string
+| Name |   Datatype   |      Definition    |    Possible Values  |
+| ----- | ----- | ----- |----- |
+| repo  |     object  | Unique name for the repo |  slash delimited string|
+| language |  object | The programming language used in this project | string (eg python/javascript/etc) |
+| readme contents     |   object |  The entirety of the project's readme file | plaintext string |
 
  
 
@@ -80,13 +63,14 @@ Additionally, a set of features were added to the data set:
 
  
 
-Name    Datatype             Definition            Possible Values
+| Name  |  Datatype    |         Definition     |       Possible Values |
+| ----- | ----- | ----- |----- |
+| clean |  object|  Parsing Text of the readme_content column  :| plaintext string  |
+| stemmed |  object |  Stemmed text of the clean column | plaintext string  |
+| lemmatized | object| Lemmatized text of clean  column | plaintext string  |
+| readme_length |  int64  | lenght of the README content |  numeric |
+| word_count | int64  | total of words of the README  | numeric |
 
-stemmed           
-
-lemmatized
-
-etc
 
  
 
@@ -98,19 +82,10 @@ The overall process followed in this project, is as follows:
 
  
 
-Plan
+###  Plan  -->  Acquire   --> Prepare  --> Explore  --> Model  --> Deliver
 
-Acquire
 
-Prepare
-
-Explore
-
-Model
-
-Deliver
-
- 
+--------------
 
 ### 1. Plan
 
@@ -154,7 +129,7 @@ This functionality is stored in the python script "prepare.py". It will perform 
 
 - lowercase the readme contents to avoid case sensitivity
 
-- remove non-standard (non ascii) characters
+- remove non-standard (non ascii) characters, any accented characters
 
 - tokenize the data
 
@@ -182,6 +157,10 @@ Test: 20% of the data
 
 This functionality resides in the "explore.py" file, which provides the following functionality:
 
+- What are the most common words in READMEs?
+- What does the distribution of IDFs look like for the most common words?
+- Does the length of the README vary by programming language?
+- Do different programming languages use a different number of unique words?
  
 
  
