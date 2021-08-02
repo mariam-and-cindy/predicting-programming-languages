@@ -179,6 +179,7 @@ Fit the best performing model on test data.
 ### 6. Deliver
 
 Present findings via PowerPoint slides.
+The slide deck can be found [here.](https://docs.google.com/presentation/d/1gmnfnelX_igWFdtQv7d0Fj75rbXO-L0Qou2Anx452aE/edit?usp=sharing)
 
 
 ### To recreate
