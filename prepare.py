@@ -200,12 +200,6 @@ def prepare_mf (df,extra_words=[], exclude_words=[] ):
     and then clean, tokenize, stemming, lemmatize
     '''
     
-    # remove non english
-    index_nonenglish = [16,19,37,43,76,90,108,115,124,131,135,138,143,151,152,156,166,171,174,185,193,197,199,
-       205,208,211, 216,217,221,224,229,230,239,241,248,273,277,278,279,292,298,310,311,316,317,
-       324,328,329,330,336,341,352,357,365,366,372,374,379,385,390,399]
-
-    df = df.drop(df.index[[index_nonenglish]])
     
     
     #remove duplicates 
