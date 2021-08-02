@@ -25,44 +25,6 @@ from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 
 
-def select_rfe (X_df, y_df, n_features, method):
-    '''
-    Takes in the predictors, the target, and the number of features to select (k) ,
-    and returns the names of the top k selected features based on the Recursive Feature Elimination (RFE)
-    X_df : the predictors
-    y_df : the target
-    n_features : the number of features to select (k)
-    method : LinearRegression, LassoLars, TweedieRegressor
-    Example
-    select_rfe(X_train_scaled, y_train, 2, LinearRegression())
-    '''
-    lm = method
-    rfe = RFE(estimator=lm, n_features_to_select= n_features)
-    rfe.fit(X_df, y_df)
-    top_rfe = list(X_df.columns[rfe.support_])
-    print(f'The top {n_features} selected feautures based on the the RFE class class are: {top_rfe}' )
-    print(pd.Series(dict(zip(X_df.columns, rfe.ranking_))).sort_values())
-    return top_rfe
-
-def select_kbest  (X_df, y_df, n_features):
-    '''
-    Takes in the predictors, the target, and the number of features to select (k),
-    and returns the names of the top k selected features based on the SelectKBest class
-    
-    X_df : the predictors
-    y_df : the target
-    n_features : the number of features to select (k)
-    Example
-    select_kbest(X_train_scaled, y_train, 2)
-    '''
-    
-    f_selector = SelectKBest(score_func=f_classif, k= n_features)
-    f_selector.fit(X_df, y_df)
-    mask = f_selector.get_support()
-    X_df.columns[mask]
-    top = list(X_df.columns[mask])
-    print(f'The top {n_features} selected feautures based on the SelectKBest class are: {top}' )
-    return top
 
 
 
@@ -146,6 +108,8 @@ def model_performs (X_df, y_df, model):
     ''')
     display(clas_rep)
 
+    return round(acc, 3)
+
 
 def compare_train_val (model, name_dataset1, X, y, name_dataset2,  X2, y2 , name):
     '''
@@ -172,8 +136,8 @@ def compare_train_val (model, name_dataset1, X, y, name_dataset2,  X2, y2 , name
     pred_2 = model.predict(X2)
 
     #score = accuracy
-    acc_1 = model.score(X, y)
-    acc_2 = model.score(X2, y2)
+    acc_1 = round(model.score(X, y),3)
+    acc_2 = round(model.score(X2, y2),3)
 
 
     #conf Matrix
@@ -222,7 +186,7 @@ def compare_train_val (model, name_dataset1, X, y, name_dataset2,  X2, y2 , name
     
     metric_dic = {'model_name': name, 
           (name_dataset1 +'_score'): acc_1,
-           (name_dataset2 +'_score'): acc_2}
+          (name_dataset2 +'_score'): acc_2}
     return metric_dic
 
 
