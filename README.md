@@ -1,4 +1,6 @@
-# Predicting Programming Languages from Github Repositories  - NLP Project 
+![Predicting Programming Languages (1)](https://user-images.githubusercontent.com/80604404/127930941-9d169b1a-877a-4167-876c-abbf27bd8166.png)
+
+# Predicting Programming Languages from Github Repositories  
 
  
 
