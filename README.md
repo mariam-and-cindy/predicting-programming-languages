@@ -6,11 +6,11 @@
 
 -------------------
 
-Perform statistical analysis on data collected via web-scraping of the GitHub site. After collecting a minimal amount of data from GitHub, including the project's Readme file, attempt to predict the language used in each project.
+Perform statistical analysis on data collected via web-scraping of the GitHub site. After collecting a minimal amount of data from GitHub, including the project's Readme file, we attempted to predict the primary programming language used in each project.
 
  
 
-This involves data cleaning, wrangling and exploration, as well as modeling and validation/verification of model result.
+This involves data cleaning, wrangling and exploration, as well as modeling and validation/verification of modeling results.
 
  
 
@@ -28,9 +28,7 @@ This involves data cleaning, wrangling and exploration, as well as modeling and 
 
                 d. modeling
 
-2. Perform statistical analysis to test hypotheses
-
-3. Build and evaluate Classification models to predict the Programming Language used in a given project
+2. Build and evaluate Classification models to predict the Programming Language used in a given Readme.
 
  
 
@@ -38,9 +36,9 @@ This involves data cleaning, wrangling and exploration, as well as modeling and 
 
 --------------
 
-- Make use of NLP to predict programming language based on Readme documents
+- Make use of NLP to predict programming language based on Readme content.
 
-- Perform a number of parsing operations to isolate and process key text features - including lemmatization, stemming and removal of stopwords
+- Perform a number of parsing operations to isolate and process key text features - including lemmatization, stemming and removal of stopwords.
 
  
 
@@ -89,27 +87,27 @@ The overall process followed in this project, is as follows:
 
 ### 1. Plan
 
-Create a list of tasks to complete in the Trello Board
+Create a list of tasks to complete in [this Trello Board.](https://trello.com/b/PddXdOTJ/nlp-project)
 
-Perform preliminary examination of a number of GitHub projects
+Perform preliminary examination of a number of GitHub projects.
 
-Acquire tokens and permissions to scrape data from the GitHub website
+Acquire tokens and permissions to scrape data from the GitHub website.
 
  
 
 ### 2. Acquire
 
-This is accomplished via the python script named “acquire.py”. The script will use credentials (stored in env.py) to collects data using from GitHub.com in various ways
+This is accomplished via the python script named “acquire.py”. The script will use credentials (stored in env.py) to collect data from GitHub.com in various ways
 
-- first, collect a number of "URLs", or Repository names, so that the subsequent acquision function will be able to seek out those repositories
+- first, collect a number of "URLs", or Repository names, so that the subsequent acquision function will be able to seek out those repositories.
 
-- use BeautifulSoup to parse multiple pages (approximately 20) of the top-forked repositories, captured here: https://github.com/search?o=desc&p=<pageNumber>&q=stars%3A%3E1&s=forks&type=Repositories
+- use BeautifulSoup to parse multiple pages (approximately 20) of the top-forked repositories, captured [here.](https://github.com/search?o=desc&p=<pageNumber>&q=stars%3A%3E1&s=forks&type=Repositories)
 
-- apply random sleep durations to web calls to avoid rate limiting - GitHub prevents certain high-frequency requests
+- apply random sleep durations to web calls to avoid rate limiting - GitHub prevents certain high-frequency requests.
 
-- store these in git_urls.csv - that way, we would not hit GituHub's page and scrape the same data repeatedly. Moreover, this ensures that subsequent processing executions will consistently use the same repo list, leading to a more reliable and consistent result
+- store these in git_urls.csv - that way, we would not hit GituHub's page and scrape the same data repeatedly. Moreover, this ensures that subsequent processing executions will consistently use the same repo list, leading to a more reliable and consistent result.
 
-- capture these repository names as a strings in  a python list object
+- capture these repository names as a strings in  a python list object.
 
 - Once the list of repositories is collected, use a second script to collect the following information from those repositories, including:
 
@@ -119,7 +117,7 @@ This is accomplished via the python script named “acquire.py”. The script wi
 
                 - contents of the readme for that repository
 
-- These values are dumped, as json data, into the data2.json file - this once again ensures that we are not using cached data and avoids unnecessary web calls to the GitHub API, while maintaining consistency in results
+- These values are dumped, as json data, into the data2.json file - this once again ensures that we are not using cached data and avoids unnecessary web calls to the GitHub API, while maintaining consistency in results.
 
  
 
@@ -145,11 +143,11 @@ This functionality is stored in the python script "prepare.py". It will perform 
 
 - Split the data into 3 datasets - train/test/validate - used in modeling
 
-Train: 56% of the data
+  - Train: 56% of the data
 
-Validate: 24% of the data
+  - Validate: 24% of the data
 
-Test: 20% of the data
+  - Test: 20% of the data
 
  
 
@@ -158,28 +156,29 @@ Test: 20% of the data
 This functionality resides in the "explore.py" file, which provides the following functionality:
 
 - What are the most common words in READMEs?
+ 
 - What does the distribution of IDFs look like for the most common words?
+ 
 - Does the length of the README vary by programming language?
+ 
 - Do different programming languages use a different number of unique words?
  
 
- 
+
 
 ### 5. Model
 
-Generate a baseline, against which all models will be evaluated
+Generate a baseline, against which all models will be evaluated.
 
-Compare the models against the baseline and deduce which has the lowest RMSE and highest R-squared value
+Compare the models against the baseline and deduce which has the highest overall accuracy scores.
 
-Fit the best performing model on test data
+Fit the best performing model on test data.
 
-Create visualizations of the residuals and the actual vs predicted distributions
 
- 
 
 ### 6. Deliver
 
-Present findings via PowerPoint slides
+Present findings via PowerPoint slides.
 
 
 ### To recreate
@@ -196,9 +195,10 @@ Next, run the acquire script in your command line, using the following command:
 
 python acquire.py
 
+A file named 'data2.json' will be stored locally in this repository. You can either convert this file to a csv and read that into a dataframe or download the git_data.csv file in this repository and read that into a dataframe.
  
-
-Finally, open the Jupyter notebook titled “” and execute the code within.
+ 
+Finally, open the Jupyter notebook titled “final_report_nlp” and execute the code within.
 
  
 
@@ -208,7 +208,9 @@ Finally, open the Jupyter notebook titled “” and execute the code within.
 ---------
 
 During the analysis process, we made use of the following classification  models:
-
+- Decsion Tree
+- KNN
+- Logistic Regression
  
 
  
@@ -218,3 +220,5 @@ During the analysis process, we made use of the following classification  models
 ----------
 
 If we had more time, we would:
+
+- 
