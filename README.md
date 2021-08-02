@@ -196,8 +196,7 @@ Next, run the acquire script in your command line, using the following command:
 
 python acquire.py
 
-A file named 'data2.json' will be stored locally in this repository. You can either convert this file to a csv and read that into a dataframe or download the git_data.csv file in this repository and read that into a dataframe.
- 
+Download the git_data.csv file in this repository.
  
 Finally, open the Jupyter notebook titled “final_report_nlp” and execute the code within.
 
@@ -208,7 +207,7 @@ Finally, open the Jupyter notebook titled “final_report_nlp” and execute the
 
 ---------
 
-- During the analysis process, we made use of the following classification  models:
+- During the modeling process, we made use of the following classification alogrithms:
   - Decsion Tree
   - KNN
   - Logistic Regression
@@ -216,7 +215,7 @@ Finally, open the Jupyter notebook titled “final_report_nlp” and execute the
   - Naive Bayes
 - We evaluated model perfomance based on the overall accuracy scores.
 - All models beat the baseline accuracy of 34%.
-- OUr best performing model was the Decision Tree Model which had an overall accuracy of 55% on test data.
+- Our best performing model was the Decision Tree Model which had an overall accuracy of 55% on test data.
  
 
  
